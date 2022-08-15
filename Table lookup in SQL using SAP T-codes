@@ -4,22 +4,27 @@
 --You can search with tt, or without tt
 --To search with tt, use TableName, to search without tt use Table_Name
 
-use '%databasename%'
+use [Database]
 go
-with column_prop (TableName, ColumnName)
-as
-(SELECT so.name AS TableName, sc.name AS ColumnName
-FROM sys.objects so INNER JOIN
-sys.columns sc ON so.object_id = sc.object_id
-WHERE so.type = 'u')
 
-SELECT Table_Name, Table_Description, Field_Name, Field_Description, column_prop.TableName, column_prop.ColumnName
-FROM (SELECT T1.TABNAME AS Table_Name, T3.DDTEXT AS Table_Description, T1.FIELDNAME AS Field_Name, T4.DDTEXT AS Field_Description
-FROM %databasename%.dbo.DD03L AS T1 LEFT OUTER JOIN
-%databasename%.dbo.DD02T AS T3 ON T1.TABNAME = T3.TABNAME AND T1.AS4LOCAL = T3.AS4LOCAL AND T1.AS4VERS = T3.AS4VERS AND T3.DDLANGUAGE = 'E' LEFT OUTER JOIN
-%databasename%.dbo.DD04T AS T4 ON T1.ROLLNAME = T4.ROLLNAME AND T1.AS4LOCAL = T4.AS4LOCAL AND T1.AS4VERS = T4.AS4VERS AND T4.DDLANGUAGE = 'E' LEFT OUTER JOIN
-(SELECT DOMNAME, AS4LOCAL, AS4VERS, COUNT(*) AS Domain_Value_Count
-FROM %databasename%.dbo.DD07L
-GROUP BY DOMNAME, AS4LOCAL, AS4VERS) AS T6 ON T1.DOMNAME = T6.DOMNAME AND T1.AS4LOCAL = T6.AS4LOCAL AND T1.AS4VERS = T6.AS4VERS
-WHERE (NOT (T1.FIELDNAME LIKE '.INC%')) AND (T1.AS4LOCAL = 'A')) AS T0 inner join column_prop on t0.Table_Name = TRIM('tt' from column_prop.TableName) and t0.Field_Name = column_prop.ColumnName
-WHERE Table_Name = '{table name here}'
+WITH column_prop (TableName, ColumnName) AS
+(
+   SELECT so.name AS TableName, sc.name AS ColumnName
+   FROM sys.objects so
+   INNER JOIN sys.columns sc ON so.object_id = sc.object_id
+   WHERE so.type = 'u'                                                                                                                             --U is user defined tables
+)
+
+SELECT DISTINCT CP.TableName, T0.Table_Name, T0.Table_Description, T0.Field_Name, T0.Field_Description
+FROM
+(
+   SELECT T1.TABNAME AS Table_Name, T3.DDTEXT AS Table_Description, T1.FIELDNAME AS Field_Name, T4.DDTEXT AS Field_Description
+   FROM dbo.DD03L AS T1                                                                                                                           --DD03L is the table name
+   LEFT OUTER JOIN dbo.DD02T AS T3 ON T1.TABNAME = T3.TABNAME AND T1.AS4LOCAL = T3.AS4LOCAL AND T1.AS4VERS = T3.AS4VERS AND T3.DDLANGUAGE = 'E'   --DD02T is the table description
+   LEFT OUTER JOIN dbo.DD04T AS T4 ON T1.ROLLNAME = T4.ROLLNAME AND T1.AS4LOCAL = T4.AS4LOCAL AND T1.AS4VERS = T4.AS4VERS AND T4.DDLANGUAGE = 'E' --DD04T is the field description
+) AS T0
+LEFT OUTER JOIN column_prop AS CP ON T0.Table_Name = TRIM('tt' from CP.TableName) and T0.Field_Name = CP.ColumnName
+WHERE 
+	((Table_Name LIKE 'QMAT' OR Table_Name LIKE 'KLAT') OR Table_Name IS NOT NULL AND Table_Name NOT LIKE '%/%') AND 
+	(Field_Description IS NOT NULL AND Field_Name NOT LIKE '%/%' AND Field_Name NOT LIKE '%[_]%') AND Table_Name = '[table_name here]'	--Remove the last section (Table_Name) if you want to see the all of the tables and their related fields. You can also search by field description or field name, or table description using their respective names.
+ORDER BY Table_Name, Field_Name;
