@@ -1,0 +1,27 @@
+USE [Database Name]
+
+SELECT 
+	sys.triggers.object_id as [ObjectID],
+	sys.schemas.name as [Name],
+	sys.objects.name as [Table],
+	sys.triggers.name as [TriggerName],
+	sys.triggers.parent_class_desc as [Parent],
+	CASE (sys.triggers.is_instead_of_trigger)
+		WHEN 0 THEN 'AFTER'
+		WHEN 1 THEN 'INSTEAD OF'
+	END AS [TriggerType],
+	sys.trigger_events.type_desc as [Event],
+	CASE (sys.triggers.is_disabled)
+		WHEN 0 THEN 'ENABLED'
+		WHEN 1 THEN 'DISABLED'
+	END AS [TriggerState]
+FROM sys.triggers
+JOIN sys.trigger_events
+	ON sys.triggers.object_id = sys.trigger_events.object_id
+JOIN sys.objects 
+	ON sys.triggers.parent_id = sys.objects.object_id
+JOIN sys.schemas
+	ON sys.objects.schema_id = sys.schemas.schema_id
+WHERE 
+	sys.triggers.parent_class =1
+ORDER BY [Table];
