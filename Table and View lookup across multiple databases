@@ -1,0 +1,22 @@
+DECLARE @table Table
+(
+	Table_Name nvarchar(2000),
+	Table_Owner nvarchar(2000),
+	Table_Qualifier nvarchar(1200),
+	Table_Type nvarchar(1000),
+	fUsePattern bit
+
+)
+
+USE [DatabaseName]  -- You can add this as many times as you'd like to have the tables and views in those databases.
+
+INSERT INTO @table
+EXECUTE sp_tables
+
+SELECT 
+	Table_Name AS DatabaseName, 
+	Table_Owner, 
+	Table_Qualifier AS [Name], -- Use this to find what table or view you're looking for in the where clause
+	Table_Type
+FROM @table
+ORDER BY DatabaseName, [Name] asc
