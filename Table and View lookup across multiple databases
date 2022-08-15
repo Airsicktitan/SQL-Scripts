@@ -13,6 +13,11 @@ USE [DatabaseName]  -- You can add this as many times as you'd like to have the 
 INSERT INTO @table
 EXECUTE sp_tables
 
+USE [DatabaseName]  -- You can add this as many times as you'd like to have the tables and views in those databases.
+
+INSERT INTO @table
+EXECUTE sp_tables
+
 SELECT 
 	Table_Name AS DatabaseName, 
 	Table_Owner, 
