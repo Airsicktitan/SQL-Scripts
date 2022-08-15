@@ -1,5 +1,6 @@
 -- There were several cases of needing to find a specific column across a large tableset
 -- This utility script helps me quickly check for which tables contain a specific column
+-- This also helps me to find the column names in English, in a way that makes sense to talk to the end user
 -- Left variables in place for customization as needed for situation
 --You can search with tt, or without tt
 --To search with tt, use TableName, to search without tt use Table_Name
