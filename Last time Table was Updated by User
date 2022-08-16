@@ -1,0 +1,21 @@
+SELECT
+	d.name [Database],
+	OBJECT_NAME(s.OBJECT_ID) AS TableName,
+	s.last_user_update,
+	s.user_lookups,
+	s.last_user_scan,
+	s.last_user_seek
+FROM 
+	sys.dm_db_index_usage_stats s
+JOIN
+	sys.partitions p
+ON
+	s.object_id = p.object_id
+JOIN
+	sys.databases d
+ON
+	d.database_id = s.database_id
+WHERE 
+	s.database_id = DB_ID ('[database]')
+ORDER BY
+	d.name;
