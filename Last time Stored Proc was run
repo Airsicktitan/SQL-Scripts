@@ -1,0 +1,17 @@
+EXECUTE master.sys.sp_MSforeachdb
+'
+IF ''?'' IN (''?'')BEGIN 
+USE ?
+SELECT
+	db_name() [Database],
+	o.name [Name],
+	ps.last_execution_time [Last Run]
+FROM
+	sys.dm_exec_procedure_stats ps 
+JOIN
+	sys.objects o 
+ON
+	ps.object_id = o.object_id 
+ORDER BY
+	ps.last_execution_time	
+END'
