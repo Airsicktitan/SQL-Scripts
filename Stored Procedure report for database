@@ -1,0 +1,11 @@
+USE [database]
+GO
+
+SELECT 
+ DB_NAME() [Database],
+ NAME [Stored Proc Name],
+ create_date [Date Created],
+ modify_date [Date Modified]
+FROM 
+	sys.procedures 
+Order By [Stored Proc Name]
