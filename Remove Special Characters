@@ -1,0 +1,24 @@
+
+/*Creates the function to remove any special char by looping through the string individually and finding them and removing them*/
+
+GO
+CREATE or ALTER FUNCTION [dbo].[RemoveNonAlphaCharacters] (@Temp VARCHAR(1000))
+RETURNS VARCHAR(1000)
+AS
+BEGIN
+
+    DECLARE @KeepValues AS VARCHAR(50)
+    SET @KeepValues = '%[^a-z '' 0-9]%'
+    WHILE PATINDEX(@KeepValues, @Temp) > 0
+        SET @Temp = STUFF(@Temp, PATINDEX(@KeepValues, @Temp), 1, '')
+    RETURN @Temp
+END
+
+GO
+
+
+/*String to remove anything not a letter or space*/
+SELECT dbo.RemoveNonAlphaCharacters('Hello, world! There will be no special characters once run.')
+
+/*drops the function to save space*/
+DROP FUNCTION [dbo].[RemoveNonAlphaCharacters]
